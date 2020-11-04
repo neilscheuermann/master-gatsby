@@ -1,15 +1,31 @@
 import React from 'react';
+import styled from 'styled-components';
 import { graphql } from 'gatsby';
+import Img from 'gatsby-image';
 
-export default function PizzaTemplate() {
+const PizzaGrid = styled.div`
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+`;
+
+export default function PizzaTemplate({ data: { pizza } }) {
   return (
-    <div>
-      <p>Pizza Template Page</p>
-    </div>
+    <PizzaGrid>
+      <Img fluid={pizza.image.asset.fluid} />
+      <div>
+        <h2 className="mark">{pizza.name}</h2>
+        <ul>
+          {pizza.toppings.map((topping) => (
+            <li key={topping.id}>{topping.name}</li>
+          ))}
+        </ul>
+      </div>
+    </PizzaGrid>
   );
 }
 
-// This needs to be dynamix based on the slug passed in via context in
+// This needs to be dynamic based on the slug passed in via context in
 // gatsby-node.js.
 // Can access pageContext props from inside graphql`` using $.
 // NOTE: Can also do these queries in `gatsby-node.js` but this way follows the
