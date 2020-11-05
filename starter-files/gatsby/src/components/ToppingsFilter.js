@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 // Can only run dynamix queries at the page level, currently.
 // Can run static query anywhere, using a React hook
-export default function ToppingsFilter() {
+export default function ToppingsFilter({ activeTopping }) {
   // Get a list of all the toppings
   // Get a list of all the Pizzas with their toppings
   const { toppings, pizzas } = useStaticQuery(graphql`
@@ -34,6 +34,10 @@ export default function ToppingsFilter() {
   // Link it up......
   return (
     <ToppingsStyles>
+      <Link to="/pizzas">
+        <span className="name">all</span>
+        <span className="count">{pizzas.nodes.length}</span>
+      </Link>
       {toppingsWithCounts.map((topping) => (
         <Link to={`/topping/${topping.name}`} key={topping.name}>
           <span className="name">{topping.name}</span>
@@ -67,7 +71,8 @@ const ToppingsStyles = styled.div`
       background: white;
       padding: 2px 5px;
     }
-    .active {
+
+    &[aria-current='page'] {
       background: var(--yellow);
     }
   }
