@@ -1,4 +1,31 @@
 import path from 'path';
+import fetch from 'isomorphic-fetch';
+
+// Gatsby Node APIs
+//
+
+export async function sourceNodes(params) {
+  await fetchBeersAndTurnIntoNodes(params);
+}
+
+// As seen in the docs, this is run after the initial sourcing (sanity for this
+// course), but before it builds the website. Can tell by logging something then
+// run `npm start` again.
+export async function createPages(params) {
+  // Create pages dynamically
+  // Wait for all promises to be resolved before finishing this function
+  // but this runs in parallel instead of sequentially.
+  await Promise.all([
+    // 1. Pizzas
+    turnPizzasIntoPages(params),
+    // 2. Toppings
+    turnToppingsIntoPages(params),
+    // 3. Slicemasters
+  ]);
+}
+
+// Helpers
+//
 
 async function turnPizzasIntoPages({ graphql, actions }) {
   // 1. Get a template for this page
@@ -60,17 +87,33 @@ async function turnToppingsIntoPages({ graphql, actions }) {
   });
 }
 
-// As seen in the docs, this is run after the initial sourcing (sanity for this
-// course), but before it builds the website. Can tell by logging something then
-// run `npm start` again.
-export async function createPages(params) {
-  // Create pages dynamically
-  // Wait for all promises to be resolved before finishing this function
-  await Promise.all([
-    // 1. Pizzas
-    turnPizzasIntoPages(params),
-    // 2. Toppings
-    turnToppingsIntoPages(params),
-    // 3. Slicemasters
-  ]);
+async function fetchBeersAndTurnIntoNodes({
+  actions,
+  createNodeId,
+  createContentDigest,
+}) {
+  // 1. Fetch a list of beers (can't currently use fetch in node since it's
+  // current a browser API)
+  //  - Need to use something in Node called isomorphic fetch instead
+  const res = await fetch('https://sampleapis.com/beers/api/ale');
+  const beers = await res.json();
+
+  // 2. Loop over each one
+  for (const beer of beers) {
+    const nodeMeta = {
+      id: createNodeId(`beer-${beer.name}`),
+      parent: null,
+      children: [],
+      internal: {
+        // Specifies the query name
+        type: 'Beer',
+        mediaType: 'application/json',
+        contentDigest: createContentDigest(beer),
+      },
+    };
+
+    // 3. Create a node for that beer
+    const node = { ...beer, ...nodeMeta };
+    actions.createNode(node);
+  }
 }
