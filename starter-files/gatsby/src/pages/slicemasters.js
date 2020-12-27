@@ -2,10 +2,19 @@ import React from 'react';
 import { graphql, Link } from 'gatsby';
 import Image from 'gatsby-image';
 import styled from 'styled-components';
+import Pagination from '../components/pagination';
 
-export default function SlicemastersPage({ data }) {
+export default function SlicemastersPage({ data, pageContext }) {
   return (
     <>
+      <Pagination
+        // if there's no pageContext.pageNumber, it means it's the slicemasters
+        // page
+        pageNumber={pageContext.pageNumber || 1}
+        totalCount={data.slicemasters.totalCount}
+        pageSize={process.env.GATSBY_PAGE_SIZE}
+        base="/slicemasters"
+      />
       <SlicemasterGrid>
         {data.slicemasters.nodes.map((person) => (
           <SlicemasterStyles key={person.id}>
