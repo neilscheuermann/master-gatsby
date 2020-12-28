@@ -3,10 +3,12 @@ import { graphql, Link } from 'gatsby';
 import Image from 'gatsby-image';
 import styled from 'styled-components';
 import Pagination from '../components/pagination';
+import SEO from '../components/SEO';
 
 export default function SlicemastersPage({ data, pageContext }) {
   return (
     <>
+      <SEO title={`Slicemasters - Page ${pageContext.pageNumber || 1}`} />
       <Pagination
         // if there's no pageContext.pageNumber, it means it's the slicemasters
         // page
@@ -18,7 +20,7 @@ export default function SlicemastersPage({ data, pageContext }) {
       <SlicemasterGrid>
         {data.slicemasters.nodes.map((person) => (
           <SlicemasterStyles key={person.id}>
-            <Link to="slicemaster/TODO">
+            <Link to={`/slicemaster/${person.slug.current}`}>
               <h2>
                 <span className="mark">{person.name}</span>
               </h2>
