@@ -1,10 +1,12 @@
 import React from 'react';
 import { graphql } from 'gatsby';
 import Img from 'gatsby-image';
+import styled from 'styled-components';
 import SEO from '../components/SEO';
 import useForm from '../utils/useForm';
 import calculatePizzaPrice from '../utils/calculatePizzaPrice';
 import formatMoney from '../utils/formatMoney';
+import MenuItemStyles from '../styles/MenuItemStyles';
 
 export default function OrderPage({ data }) {
   const { values, updateValue } = useForm({
@@ -14,7 +16,7 @@ export default function OrderPage({ data }) {
   return (
     <>
       <SEO title="Order a Pizza!" />
-      <form>
+      <OrderStyles>
         <fieldset>
           <legend>Your Info</legend>
           <label htmlFor="name">Name</label>
@@ -33,10 +35,10 @@ export default function OrderPage({ data }) {
           />
         </fieldset>
 
-        <fieldset>
+        <fieldset className="menu">
           <legend>Menu</legend>
           {data.pizzas.nodes.map(({ id, name, image, price }) => (
-            <div key={id}>
+            <MenuItemStyles key={id}>
               <Img
                 width="50"
                 height="50"
@@ -53,10 +55,14 @@ export default function OrderPage({ data }) {
                   </button>
                 ))}
               </div>
-            </div>
+            </MenuItemStyles>
           ))}
         </fieldset>
-      </form>
+
+        <fieldset className="order">
+          <legend>Order</legend>
+        </fieldset>
+      </OrderStyles>
     </>
   );
 }
@@ -79,6 +85,34 @@ export const query = graphql`
           }
         }
       }
+    }
+  }
+`;
+
+const OrderStyles = styled.form`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  fieldset {
+    grid-column: span 2;
+    max-height: 600px;
+    // Makes it scrollable
+    overflow: auto;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+
+    &.menu,
+    &.order {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 900px) {
+    fieldset.menu,
+    fieldset.order {
+      grid-column: span 2;
     }
   }
 `;
