@@ -3,15 +3,22 @@ import { graphql } from 'gatsby';
 import Img from 'gatsby-image';
 import styled from 'styled-components';
 import SEO from '../components/SEO';
+import PizzaOrder from '../components/PizzaOrder';
 import useForm from '../utils/useForm';
+import usePizza from '../utils/usePizza';
 import calculatePizzaPrice from '../utils/calculatePizzaPrice';
 import formatMoney from '../utils/formatMoney';
 import MenuItemStyles from '../styles/MenuItemStyles';
 
 export default function OrderPage({ data }) {
+  const pizzas = data.pizzas.nodes;
   const { values, updateValue } = useForm({
     name: '',
     email: '',
+  });
+  const { order, addToOrder, removeFromOrder } = usePizza({
+    pizzas,
+    inputs: {},
   });
   return (
     <>
@@ -37,7 +44,7 @@ export default function OrderPage({ data }) {
 
         <fieldset className="menu">
           <legend>Menu</legend>
-          {data.pizzas.nodes.map(({ id, name, image, price }) => (
+          {pizzas.map(({ id, name, image, price }) => (
             <MenuItemStyles key={id}>
               <Img
                 width="50"
@@ -50,7 +57,10 @@ export default function OrderPage({ data }) {
               </div>
               <div>
                 {['S', 'M', 'L'].map((size) => (
-                  <button type="button">
+                  <button
+                    type="button"
+                    onClick={() => addToOrder({ id, size })}
+                  >
                     {size} {formatMoney(calculatePizzaPrice(price, size))}
                   </button>
                 ))}
@@ -61,6 +71,11 @@ export default function OrderPage({ data }) {
 
         <fieldset className="order">
           <legend>Order</legend>
+          <PizzaOrder
+            order={order}
+            removeFromOrder={removeFromOrder}
+            pizzas={pizzas}
+          />
         </fieldset>
       </OrderStyles>
     </>
